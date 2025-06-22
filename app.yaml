@@ -1,0 +1,76 @@
+name: outline-hub
+region: nyc
+services:
+- name: outline
+  github:
+    repo: Instabidsai/outline-deployment
+    branch: main
+    deploy_on_push: true
+  dockerfile_path: Dockerfile
+  instance_count: 1
+  instance_size_slug: professional-xs
+  http_port: 8080
+  routes:
+  - path: /
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: SECRET_KEY
+    type: SECRET
+    value: "REPLACE_WITH_64_CHAR_STRING"
+  - key: UTILS_SECRET
+    type: SECRET
+    value: "REPLACE_WITH_64_CHAR_STRING"
+  - key: DATABASE_URL
+    type: SECRET
+    value: "postgresql://postgres.[PASSWORD]@db.tqthesdjiewlcxpvqmjl.supabase.co:5432/postgres"
+  - key: REDIS_URL
+    value: "redis://red-cqbdq4jv2p9s73fjnqkg:6379"
+  - key: URL
+    value: "https://outline-hub-dyjte.ondigitalocean.app"
+  - key: FORCE_HTTPS
+    value: "true"
+  - key: SLACK_CLIENT_ID
+    type: SECRET
+    value: "YOUR_SLACK_CLIENT_ID"
+  - key: SLACK_CLIENT_SECRET
+    type: SECRET
+    value: "YOUR_SLACK_CLIENT_SECRET"
+  - key: AWS_ACCESS_KEY_ID
+    type: SECRET
+    value: "YOUR_SUPABASE_SERVICE_KEY"
+  - key: AWS_SECRET_ACCESS_KEY
+    type: SECRET
+    value: "YOUR_SUPABASE_SERVICE_KEY"
+  - key: AWS_REGION
+    value: "us-east-1"
+  - key: AWS_S3_UPLOAD_BUCKET_URL
+    value: "https://tqthesdjiewlcxpvqmjl.supabase.co/storage/v1"
+  - key: AWS_S3_UPLOAD_BUCKET_NAME
+    value: "outline-uploads"
+  - key: AWS_S3_FORCE_PATH_STYLE
+    value: "true"
+  - key: AWS_S3_ACL
+    value: "private"
+  - key: SMTP_HOST
+    value: "smtp.sendgrid.net"
+  - key: SMTP_PORT
+    value: "587"
+  - key: SMTP_USERNAME
+    value: "apikey"
+  - key: SMTP_PASSWORD
+    type: SECRET
+    value: "YOUR_SENDGRID_API_KEY"
+  - key: SMTP_FROM_EMAIL
+    value: "notifications@instabids.ai"
+  - key: SMTP_REPLY_EMAIL
+    value: "support@instabids.ai"
+  - key: SMTP_SECURE
+    value: "false"
+  - key: DEFAULT_LANGUAGE
+    value: "en_US"
+databases:
+- name: outline-redis
+  engine: REDIS
+  production: false
+  version: "7"
