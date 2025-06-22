@@ -1,0 +1,33 @@
+version: '3.8'
+
+# Simplified deployment using Supabase as backend
+services:
+  outline:
+    image: outlinewiki/outline:latest
+    env_file: .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    volumes:
+      - ./data/uploads:/var/lib/outline/uploads
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - ./data/redis:/data
+    restart: unless-stopped
+
+  # Nginx for SSL/proxy (optional if using Cloudflare)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/letsencrypt
+    depends_on:
+      - outline
+    restart: unless-stopped
