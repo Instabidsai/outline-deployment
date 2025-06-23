@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  outline:
+    image: outlinewiki/outline:latest
+    env_file: .env
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/uploads:/var/lib/outline/data
+    # Redis URL will be set in .env file using existing managed Redis
+    networks:
+      - outline-network
+
+  # No local Redis container needed - using DigitalOcean managed Redis
+  # Set REDIS_URL in .env to your managed Redis connection string
+
+  # Nginx reverse proxy with SSL
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - outline
+    networks:
+      - outline-network
+
+networks:
+  outline-network:
+    driver: bridge
+
+volumes:
+  uploads_data:
