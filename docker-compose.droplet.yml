@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  outline:
+    image: outlinewiki/outline:latest
+    env_file: .env
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    volumes:
+      - ./data/uploads:/var/lib/outline/data
+    networks:
+      - outline-network
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - outline-network
+
+  # Nginx reverse proxy with SSL
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - outline
+    networks:
+      - outline-network
+
+networks:
+  outline-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+  uploads_data:
