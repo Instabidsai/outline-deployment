@@ -1,15 +1,24 @@
+# Use Railway-specific Dockerfile
 FROM outlinewiki/outline:latest
 
-# Copy the fix scripts
-COPY supabase-fix-entrypoint.sh /supabase-fix-entrypoint.sh
-RUN chmod +x /supabase-fix-entrypoint.sh
+# Install postgresql-client for database operations
+USER root
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
 
-# DigitalOcean App Platform uses PORT environment variable
-ENV PORT=8080
+# Copy custom entrypoint
+COPY railway-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
 
-# Expose the port
-EXPOSE 8080
+# Create necessary directories
+RUN mkdir -p /opt/outline/uploads
 
-# Use our Supabase compatibility fix
-ENTRYPOINT ["/supabase-fix-entrypoint.sh"]
-CMD ["node", "./build/server/index.js"]
+# Switch back to node user
+USER node
+
+# Railway uses PORT environment variable
+ENV PORT=3000
+EXPOSE 3000
+
+# Use custom entrypoint
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh"]
+CMD ["yarn", "start"]
