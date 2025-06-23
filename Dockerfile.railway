@@ -1,0 +1,23 @@
+# Railway-optimized Dockerfile for Outline
+FROM outlinewiki/outline:latest
+
+# Install postgresql-client for database operations
+USER root
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
+# Copy custom entrypoint
+COPY railway-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/railway-entrypoint.sh
+
+# Create necessary directories
+RUN mkdir -p /opt/outline/uploads
+
+# Switch back to node user
+USER node
+
+# Expose port
+EXPOSE 3000
+
+# Use custom entrypoint
+ENTRYPOINT ["/usr/local/bin/railway-entrypoint.sh"]
+CMD ["yarn", "start"]
